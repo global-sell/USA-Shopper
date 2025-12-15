@@ -1,0 +1,152 @@
+# -------------------------------------------------
+# ✅ YBT Digital Clean URLs + USA Shopper Turnstile Protection
+# -------------------------------------------------
+
+DirectoryIndex index.php index.html
+RewriteEngine On
+RewriteBase /
+
+# -------------------------------------------------
+# Preserve Authorization Header (for API / Login)
+# -------------------------------------------------
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# -------------------------------------------------
+# 🔒 Turnstile Verification Protection
+# -------------------------------------------------
+# Skip verify.html itself, static files, bots, or verified users
+RewriteCond %{REQUEST_URI} !^/verify\.html$ [NC]
+RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff|woff2|ttf|eot|json|xml|txt|map|php)$ [NC]
+RewriteCond %{HTTP_USER_AGENT} !(googlebot|google-inspectiontool|bingbot|slurp|duckduckbot|baiduspider|yandex|facebookexternalhit|telegrambot|twitterbot) [NC]
+RewriteCond %{HTTP_COOKIE} !verified_user=true [NC]
+RewriteCond %{REQUEST_URI} ^(/(index\.php|index\.html)?|/?$) [NC]
+RewriteRule ^ /verify.html [R=302,L]
+
+# -------------------------------------------------
+# --- Auth callback handling ---
+# -------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^auth/([^/]+)$ auth/$1.php [L,QSA]
+
+# -------------------------------------------------
+# --- Remove .php from URL ---
+# -------------------------------------------------
+RewriteCond %{THE_REQUEST} \s/+([^.]+)\.php[\s?] [NC]
+RewriteRule ^ %1 [R=301,L]
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/?$ $1.php [L,QSA]
+
+# -------------------------------------------------
+# --- Blog slug rewrite ---
+# -------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^blog/([a-zA-Z0-9-]+)/?$ blog-detail.php?slug=$1 [L,QSA]
+
+# -------------------------------------------------
+# --- Product slug rewrite ---
+# -------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/(admin|assets|uploads|config|includes|blog)/
+RewriteRule ^([a-zA-Z0-9-]+)/?$ product-detail.php?slug=$1 [L,QSA]
+
+# -------------------------------------------------
+# --- Serve index.php for root /
+# -------------------------------------------------
+RewriteRule ^$ index.php [L]
+
+# -------------------------------------------------
+# --- Fallback: load index.php for clean URLs ---
+# -------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# -------------------------------------------------
+# --- Force XML MIME type for sitemap ---
+# -------------------------------------------------
+<Files "sitemap.xml">
+<IfModule mod_headers.c>
+    Header set Content-Type "application/xml; charset=utf-8"
+</IfModule>
+</Files>
+
+# -------------------------------------------------
+# --- Serve index.php for root ---
+# -------------------------------------------------
+RewriteRule ^$ index.php [L]
+
+# -------------------------------------------------
+# --- Custom project files ---
+# -------------------------------------------------
+RewriteRule ^(admin\.php|get_.*\.php|save_.*\.php|config\.php)$ $1 [L]
+
+# -------------------------------------------------
+# --- Fallback: load index.php for all clean URLs ---
+# -------------------------------------------------
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+
+# -------------------------------------------------
+# --- Security ---
+# -------------------------------------------------
+Options -Indexes
+AddDefaultCharset UTF-8
+
+<FilesMatch "^(config|database|\.env)">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# -------------------------------------------------
+# --- Security headers ---
+# -------------------------------------------------
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+<Files "verify.html">
+  <IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow"
+  </IfModule>
+</Files>
+
+# -------------------------------------------------
+# --- Compression ---
+# -------------------------------------------------
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json
+</IfModule>
+
+# -------------------------------------------------
+# --- Caching ---
+# -------------------------------------------------
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+</IfModule>
+
+# -------------------------------------------------
+# --- PHP settings ---
+# -------------------------------------------------
+<IfModule mod_php7.c>
+    php_value upload_max_filesize 50M
+    php_value post_max_size 50M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+</IfModule>
+
+# -------------------------------------------------
+# --- Error Page ---
+# -------------------------------------------------
+ErrorDocument 404 /404.php

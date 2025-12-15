@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verify Access - USA Shopper</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+  <style>
+    body {
+      background-color: #f3f4f6;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #111827;
+    }
+    .verify-box {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+    }
+    h2 { margin-bottom: 16px; font-size: 1.5rem; font-weight: 600; }
+    p { margin-bottom: 24px; color: #4b5563; font-size: 0.95rem; }
+    .footer { margin-top: 24px; font-size: 0.8rem; color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <div class="verify-box">
+    <h2>Verify Your Access</h2>
+    <p>Please complete the verification to continue to US Shopper.</p>
+
+    <div class="cf-turnstile"
+         data-sitekey="0x4AAAAAAB-sJBO_GtmVrIPg"
+         data-callback="verified"></div>
+
+    <div class="footer">© 2025 USA Shopper</div>
+  </div>
+
+  <script>
+    function verified() {
+      document.querySelector("p").innerText = "✅ Verification successful! Redirecting...";
+      document.cookie = "verified_user=true; path=/; max-age=" + (60 * 60 * 24 * 7) + "; Secure; SameSite=Lax";
+      setTimeout(() => { window.location.href = "/index.php"; }, 800);
+    }
+
+    // Backup bot redirect
+    const bots = ['googlebot','bingbot','duckduckbot','baiduspider','yandex','facebot','ia_archiver'];
+    const ua = navigator.userAgent.toLowerCase();
+    if (bots.some(bot => ua.includes(bot))) window.location.replace("https://www.usashopper.site/");
+  </script>
+</body>
+</html>

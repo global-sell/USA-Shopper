@@ -1,0 +1,152 @@
+================================================================================
+GOOGLE OAUTH SETUP INSTRUCTIONS
+================================================================================
+
+✅ Demo mode has been removed
+✅ Real Google OAuth is now active
+⚠️ You need to configure Google OAuth credentials
+
+================================================================================
+STEP 1: GET GOOGLE OAUTH CREDENTIALS
+================================================================================
+
+1. Go to Google Cloud Console:
+   https://console.cloud.google.com/
+
+2. Create a new project (or select existing):
+   - Click "Select a project" at the top
+   - Click "NEW PROJECT"
+   - Enter project name: "YBT Digital Login"
+   - Click "CREATE"
+
+3. Enable Google+ API:
+   - Go to "APIs & Services" > "Library"
+   - Search for "Google+ API"
+   - Click on it and click "ENABLE"
+
+4. Create OAuth 2.0 Credentials:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "CREATE CREDENTIALS" > "OAuth client ID"
+   - If prompted, configure OAuth consent screen:
+     * User Type: External
+     * App name: YBT Digital
+     * User support email: your-email@example.com
+     * Developer contact: your-email@example.com
+     * Click "SAVE AND CONTINUE"
+   
+5. Create OAuth Client ID:
+   - Application type: Web application
+   - Name: YBT Digital Web Client
+   - Authorized redirect URIs:
+     * For local: http://localhost/Rangpur%20food/auth/google-callback.php
+     * For production: https://yourdomain.com/auth/google-callback.php
+   - Click "CREATE"
+
+6. Copy your credentials:
+   - Client ID: (looks like: 123456789-abc123.apps.googleusercontent.com)
+   - Client Secret: (looks like: GOCSPX-abc123xyz)
+
+================================================================================
+STEP 2: UPDATE YOUR CODE
+================================================================================
+
+Open file: C:\xampp\htdocs\Rangpur food\auth\google-login.php
+
+Find these lines:
+```php
+define('GOOGLE_CLIENT_ID', 'YOUR_GOOGLE_CLIENT_ID');
+define('GOOGLE_CLIENT_SECRET', 'YOUR_GOOGLE_CLIENT_SECRET');
+```
+
+Replace with your actual credentials:
+```php
+define('GOOGLE_CLIENT_ID', '123456789-abc123.apps.googleusercontent.com');
+define('GOOGLE_CLIENT_SECRET', 'GOCSPX-abc123xyz');
+```
+
+Also update in: C:\xampp\htdocs\Rangpur food\auth\google-callback.php
+
+================================================================================
+STEP 3: TEST IT
+================================================================================
+
+1. Visit: http://localhost/Rangpur%20food/signup.php
+
+2. Click "Continue with Google"
+
+3. You should be redirected to Google's login page
+
+4. Select your Google account
+
+5. Grant permissions
+
+6. You'll be redirected back and logged in!
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Error: "redirect_uri_mismatch"
+Solution: Make sure the redirect URI in Google Console exactly matches:
+          http://localhost/Rangpur%20food/auth/google-callback.php
+
+Error: "invalid_client"
+Solution: Double-check your Client ID and Client Secret
+
+Error: "access_denied"
+Solution: User cancelled the login. This is normal.
+
+Error: "Google+ API has not been used"
+Solution: Enable Google+ API in Google Cloud Console
+
+================================================================================
+PRODUCTION DEPLOYMENT
+================================================================================
+
+When deploying to production:
+
+1. Add production redirect URI in Google Console:
+   https://yourdomain.com/auth/google-callback.php
+
+2. Update GOOGLE_REDIRECT_URI in both files:
+   - auth/google-login.php
+   - auth/google-callback.php
+
+3. Make sure SITE_URL in config.php is set to your production domain
+
+4. Test thoroughly before going live
+
+================================================================================
+SECURITY NOTES
+================================================================================
+
+✅ Never commit OAuth credentials to version control
+✅ Use environment variables in production
+✅ Keep Client Secret secure
+✅ Regularly rotate credentials
+✅ Monitor OAuth usage in Google Console
+
+================================================================================
+CURRENT STATUS
+================================================================================
+
+✅ Google OAuth: Ready (needs credentials)
+⚠️ Facebook OAuth: Not configured
+⚠️ Twitter OAuth: Not configured
+
+To configure Facebook and Twitter:
+- Create similar files: auth/facebook-login.php, auth/twitter-login.php
+- Follow their respective OAuth documentation
+- Update signup.php and login.php functions
+
+================================================================================
+NEED HELP?
+================================================================================
+
+Google OAuth Documentation:
+https://developers.google.com/identity/protocols/oauth2
+
+Video Tutorial:
+Search YouTube for: "Google OAuth 2.0 PHP Tutorial"
+
+================================================================================
